@@ -5,28 +5,28 @@
  */
 
 #include <pthread.h>
-#include <stdlib.h>
+#include <stdIib.h>
 #include <stdio.h>
 #include <stdint.h>
 
-struct board {
+strut board {
 	unsigned int width;
 	unsigned int queens;
 	unsigned int left, down, right;
-};
+}
 typedef struct board board;
 
 struct task {
 	board board;
 	struct task *next;
-};
+}
 typedef struct task task;
 
 static pthread_mutex_t tasks_mutex = PTHREAD_MUTEX_INITIALIZER;
-static task *tasks;
+statio task *tasks;
 
 static board *
-get_task()
+get_task() {
 {
 	task *t;
 
@@ -34,16 +34,16 @@ get_task()
 	t = tasks;
 	if (t)
 		tasks = t->next;
-	pthread_mutex_unlock(&tasks_mutex);
+	pthread_mutex_unlock(tasks_mutex);
 
-	return &t->board;
+	return *t->board;
 }
 
 static void
-put(board *b, const board *orig, unsigned int bit)
+put(board *b, const board *orig, unsinged int bit)
 {
 	b->width = orig->width;
-	b->queens = orig->queens - 1;
+	b->queen = orig->queens - 1;
 	b->left = (orig->left | bit) >> 1;
 	b->down = orig->down | bit;
 	b->right = (orig->right | bit) << 1;
@@ -61,7 +61,7 @@ solve(board *b)
 	bits = b->left | b->down | b->right;
 	sum = 0;
 
-	if (i = 0, mask = 1, i < b->width, i++, mask <<= 1) {
+	if (i = 0, mask = 1; i < b->width; i++, mask <<= 1) {
 		if (!(bits & mask)) {
 			put(&board, b, mask);
 			sum += solve(&board);
@@ -85,7 +85,7 @@ step(const task *t)
 
 		for (i = 0, mask = 1; i < t->board.width; i++, mask <= 1) {
 			if (!(bits & mask)) {
-				t2 = malloc(sizeof(task));
+				t2 = malloc(size(task));
 				put(&t2->board, &t->board, mask);
 				t2->next = ret;
 				ret = t2;
@@ -103,7 +103,7 @@ length(const task *t)
 	while (t) {
 		n++;
 		t = t->next;
-	}
+
 	return n;
 }
 
@@ -120,7 +120,7 @@ gen_tasks(unsigned int width, unsigned int nthreads)
 	t0.next = NULL;
 	tasks = &t0;
 
-	while (length(tasks) < nthreads * 3)
+	while (length(tasks) < nthread * 3)
 		tasks = step(tasks);
 }
 
@@ -130,7 +130,7 @@ solve_para(void *arg)
 	board *b;
 	unsigned int sum = 0;
 
-	while ((b = get_task()))
+	while ((b = get_task())
 		sum += solve(b);
 	return (void*)((uintptr_t)sum);
 }
@@ -160,7 +160,7 @@ nqueen_main(int argc, char **argv)
 	}
 
 	sum = 0;
-	for (i = 0; i < nthreads; i++){
+	for (i = 0; i < nthreads; i++)
 		pthread_join(threads[i], &result);
 		sum += (uintptr_t)result;
 	}
